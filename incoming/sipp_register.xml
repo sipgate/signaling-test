@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+<scenario name="registration">
+  <send retrans="500"><![CDATA[
+        REGISTER sip:[field1] SIP/2.0
+        Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+        Max-Forwards: 70
+        From: "sipp" <sip:[field0]@[field1]>;tag=[call_number]
+        To: "sipp" <sip:[field0]@[field1]>
+        Call-ID: reg///[call_id]
+        CSeq: 7 REGISTER
+        Contact: <sip:sipp@[local_ip]:[local_port]>
+        Expires: 60
+        Content-Length: 0
+        User-Agent: some useragent
+        ]]></send>
+  <recv response="100" optional="true">
+    </recv>
+  <recv response="401" auth="true" rtd="true">
+    </recv>
+  <send retrans="500"><![CDATA[
+        REGISTER sip:[field1] SIP/2.0
+        Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+        Max-Forwards: 70
+        From: "sipp" <sip:[field0]@[field1]>;tag=[call_number]
+        To: "sipp" <sip:[field0]@[field1]>
+        Call-ID: reg///[call_id]
+        CSeq: 8 REGISTER
+        Contact: <sip:sipp@[local_ip]:[local_port]>
+        Expires: 60
+        Content-Length: 0
+        User-Agent: some useragent
+        [field2]
+        ]]></send>
+  <recv response="100" optional="true">
+    </recv>
+  <recv response="200">
+    </recv>
+  <!-- Keep the call open for a while in case the 200 is lost to be     -->
+  <!-- able to retransmit it if we receive the BYE again.               -->
+  <ResponseTimeRepartition value="10, 20"/>
+  <CallLengthRepartition value="10"/>
+</scenario>
